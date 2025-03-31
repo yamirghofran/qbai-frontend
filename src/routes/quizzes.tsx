@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'; // Import useState, useEffect
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'; // Import useRouter
+import { createFileRoute, Link } from '@tanstack/react-router'; // Import useRouter
 import quizService from '@/api/quizservice';
 import { QuizListItem } from '@/types'; // Import the type
 import { Trash2 } from 'lucide-react'; // Import Trash icon
@@ -75,7 +75,6 @@ function QuizzesPage() {
   const [currentQuizzes, setCurrentQuizzes] = useState<QuizListItem[]>(initialQuizzes);
   const [quizToDelete, setQuizToDelete] = useState<QuizListItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false); // State for loading indicator
-  const router = useRouter(); // Get router instance for potential refresh
 
   // Update local state if loader data changes (e.g., after navigation)
   useEffect(() => {

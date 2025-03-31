@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import React from 'react';
 
 // Define the layout route for the /quiz/$quizId path segment
 // This component just renders an Outlet for its children

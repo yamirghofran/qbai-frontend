@@ -1,15 +1,6 @@
 import * as React from "react"
 import {
   BookOpen,
-  Bot, // Keep for potential future use if needed, but remove from nav
-  Command, // Keep for potential future use if needed, but remove from nav
-  Frame, // Keep for potential future use if needed, but remove from nav
-  LifeBuoy, // Keep for potential future use if needed, but remove from nav
-  Map, // Keep for potential future use if needed, but remove from nav
-  PieChart, // Keep for potential future use if needed, but remove from nav
-  Send, // Keep for potential future use if needed, but remove from nav
-  Settings2, // Keep for potential future use if needed, but remove from nav
-  SquareTerminal, // Keep for potential future use if needed, but remove from nav
   ListChecks,
   PlusCircle, // Added icon for Create Quiz
 } from "lucide-react"

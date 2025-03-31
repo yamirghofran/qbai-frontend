@@ -141,9 +141,6 @@ export default function MediaUploader() {
   const handleRemoveItem = (id: string) => {
     setMediaItems((prev) => prev.filter((item) => item.id !== id));
   };
-
-  const files = mediaItems.filter(item => item.sourceType === 'file');
-  const videos = mediaItems.filter(item => item.sourceType === 'video');
  
   const handleGenerateQuiz = async () => {
     setIsLoading(true);

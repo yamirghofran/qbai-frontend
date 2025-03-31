@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo } from "react"; // Import useEffect and useMemo
+import { useState, useMemo } from "react"; // Import useEffect and useMemo
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge"; // Import Badge component
-import { Quiz, Question as QuizDataQuestion, Option as QuizDataOption, QuizAttempt, AttemptAnswer } from "@/types"; // Import Quiz types and QuizAttempt, AttemptAnswer
+import { Quiz, Question as QuizDataQuestion, QuizAttempt } from "@/types"; // Import Quiz types and QuizAttempt, AttemptAnswer
 import quizService from "@/api/quizservice"; // Import quizService
 import { useNavigate } from "@tanstack/react-router"; // Import useNavigate
 

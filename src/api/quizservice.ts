@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { Quiz, QuizListItem, QuizAttempt, AttemptAnswer, UserAttempt } from '../types'; // Import QuizListItem, QuizAttempt, AttemptAnswer, UserAttempt
+import { Quiz, QuizListItem, QuizAttempt, UserAttempt } from '../types'; // Import QuizListItem, QuizAttempt, AttemptAnswer, UserAttempt
 
 // Type for upload response from backend
 interface UploadResponse {

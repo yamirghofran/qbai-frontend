@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'; // Removed Outlet import
-import React, { useState } from 'react';
-import { Quiz } from '@/types';
+import { useState } from 'react';
 import quizService from '@/api/quizservice';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

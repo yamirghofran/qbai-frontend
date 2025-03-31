@@ -1,6 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import React from 'react';
-import { Quiz, QuizAttempt } from '@/types';
 import quizService from '@/api/quizservice';
 import QuizInterface from '@/components/quiz-interface';
 
