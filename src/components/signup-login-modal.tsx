@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button" // Corrected import path
 import { Dialog, DialogContent } from "@/components/ui/dialog" // Corrected import path
 
 // TODO: Consider making this configurable via environment variables
-const BACKEND_URL = 'http://localhost:8080';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export function SignupLoginModal() { // Kept original name for consistency with __root.tsx import
   const handleLogin = () => {
