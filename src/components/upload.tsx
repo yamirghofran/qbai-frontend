@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router"; // Changed import for TanS
 import { File, Video, X, Loader2 } from "lucide-react"; // Added Loader2
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+//import { Input } from "@/components/ui/input";
 import quizService from "@/api/quizservice"; // Corrected import: default export
 
 // Unified type for both files and videos
@@ -60,7 +60,7 @@ function MediaItemCard({
 
 export default function MediaUploader() {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]); // Unified state
-  const [videoUrl, setVideoUrl] = useState("");
+  // const [videoUrl, setVideoUrl] = useState(""); // Commented out as YouTube upload is hidden
   const [isLoading, setIsLoading] = useState(false); // Added loading state
   const [error, setError] = useState<string | null>(null); // Added error state
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -108,34 +108,34 @@ export default function MediaUploader() {
     fileInputRef.current?.click();
   };
 
-  const handleAddVideo = () => {
-    if (videoUrl.trim() === "") return;
-
-    // Basic title extraction (can be improved)
-    let title = "YouTube Video";
-    try {
-        const urlObj = new URL(videoUrl);
-        if (urlObj.hostname.includes("youtube.com") && urlObj.searchParams.has("v")) {
-            title = `YouTube Video (${urlObj.searchParams.get("v")})`;
-        } else if (urlObj.hostname.includes("youtu.be")) {
-            title = `YouTube Video (${urlObj.pathname.slice(1)})`;
-        }
-    } catch (error) {
-        console.error("Invalid URL:", error);
-        // Keep default title or handle error appropriately
-    }
-
-
-    const newVideo: MediaItem = {
-      id: crypto.randomUUID(),
-      sourceType: "video",
-      name: title,
-      url: videoUrl,
-    };
-
-    setMediaItems((prev) => [...prev, newVideo]);
-    setVideoUrl("");
-  };
+  // const handleAddVideo = () => {
+  //   if (videoUrl.trim() === "") return;
+  //
+  //   // Basic title extraction (can be improved)
+  //   let title = "YouTube Video";
+  //   try {
+  //       const urlObj = new URL(videoUrl);
+  //       if (urlObj.hostname.includes("youtube.com") && urlObj.searchParams.has("v")) {
+  //           title = `YouTube Video (${urlObj.searchParams.get("v")})`;
+  //       } else if (urlObj.hostname.includes("youtu.be")) {
+  //           title = `YouTube Video (${urlObj.pathname.slice(1)})`;
+  //       }
+  //   } catch (error) {
+  //       console.error("Invalid URL:", error);
+  //       // Keep default title or handle error appropriately
+  //   }
+  //
+  //
+  //   const newVideo: MediaItem = {
+  //     id: crypto.randomUUID(),
+  //     sourceType: "video",
+  //     name: title,
+  //     url: videoUrl,
+  //   };
+  //
+  //   setMediaItems((prev) => [...prev, newVideo]);
+  //   setVideoUrl("");
+  // }; // Commented out as YouTube upload is hidden
 
   // Unified remove handler
   const handleRemoveItem = (id: string) => {
@@ -153,22 +153,25 @@ export default function MediaUploader() {
       .filter(item => item.sourceType === 'file' && item.file)
       .map(item => item.file as File); // Type assertion as we filtered for item.file
  
-    const youtubeUrls: string[] = mediaItems
-      .filter(item => item.sourceType === 'video' && item.url)
-      .map(item => item.url as string); // Type assertion as we filtered for item.url
+    // const youtubeUrls: string[] = mediaItems
+    //   .filter(item => item.sourceType === 'video' && item.url)
+    //   .map(item => item.url as string); // Type assertion as we filtered for item.url
+    //const youtubeUrls: string[] = []; // Keep variable defined but empty for now
  
     console.log("Files to upload:", files.map(f => f.name));
-    console.log("Video URLs:", youtubeUrls);
+    // console.log("Video URLs:", youtubeUrls); // Commented out logging
  
-    if (files.length === 0 && youtubeUrls.length === 0) {
-        setError("Please add at least one file or video URL.");
+    // if (files.length === 0 && youtubeUrls.length === 0) { // Original check
+    if (files.length === 0) { // Check only for files now
+        setError("Please add at least one file."); // Updated error message
         setIsLoading(false);
         return;
     }
  
     try {
       // Call the correct API function with the expected data structure
-      const response = await quizService.uploadContent({ files, youtubeUrls });
+      // const response = await quizService.uploadContent({ files, youtubeUrls }); // Original call
+      const response = await quizService.uploadContent({ files, youtubeUrls: [] }); // Pass empty array for youtubeUrls
       console.log("Quiz generation successful:", response);
       // TODO: Add success notification (e.g., using a toast library)
  
@@ -199,10 +202,11 @@ export default function MediaUploader() {
  
   return (
     <div className="container mx-auto py-8 max-w-5xl">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8"> {/* Adjusted gap */}
+      {/* Changed from grid to flex for centering the single upload component */}
+      <div className="flex justify-center">
         {/* Files Upload Section */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Files</h2>
+          {/*<h2 className="text-2xl font-semibold">Files</h2>*/}
           <div
             className="border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-4 h-[280px] w-full"
             onDragOver={handleDragOver}
@@ -230,7 +234,8 @@ export default function MediaUploader() {
           {/* Files list removed from here */}
         </div>
 
-        {/* YouTube Videos Section */}
+        {/* --- YouTube Videos Section (Temporarily Hidden) --- */}
+        {/*
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">YouTube Videos</h2>
           <div className="border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-4 h-[280px] w-full">
@@ -253,8 +258,8 @@ export default function MediaUploader() {
               <Button onClick={handleAddVideo}>Add URL</Button>
             </div>
           </div>
-           {/* Videos list removed from here */}
         </div>
+        */}
       </div>
 
       {/* Generate Button */}
