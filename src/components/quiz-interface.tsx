@@ -22,9 +22,9 @@ export default function QuizInterface({ quiz, attempt, attemptId }: QuizInterfac
   // console.log("QuizInterface: Rendering START", { quizId: quiz?.id, attemptId }); // Removed log
   const navigate = useNavigate();
   const totalQuestions = quiz.questions.length;
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   // Store all selected answers { questionId: selectedAnswerId }
+  // Initialize this first, as initialIndex calculation depends on it
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>(() => {
     const initialAnswers: Record<string, string> = {};
     // Ensure attempt.answers is an array before iterating
@@ -38,6 +38,35 @@ export default function QuizInterface({ quiz, attempt, attemptId }: QuizInterfac
     }
     return initialAnswers;
   });
+
+  // Calculate the initial index to start from (for resuming attempts)
+  const calculateInitialIndex = () => {
+    // Check for edge cases: no quiz or no questions
+    if (!quiz || !quiz.questions || quiz.questions.length === 0) {
+      return 0;
+    }
+    const allQuestionIds = quiz.questions.map(q => q.id);
+    // Use the initialized userAnswers state here
+    const answeredQuestionIds = Object.keys(userAnswers);
+
+    // Find the first question ID that is NOT in the answered list
+    const firstUnansweredId = allQuestionIds.find(id => !answeredQuestionIds.includes(id));
+
+    if (firstUnansweredId) {
+      // Find the index of that unanswered question
+      const index = allQuestionIds.findIndex(id => id === firstUnansweredId);
+      // Return found index, default to 0 if findIndex fails unexpectedly
+      return index >= 0 ? index : 0;
+    } else {
+      // All questions have been answered (or attempt is finished but somehow loaded here)
+      // Default to the last question index
+      return Math.max(0, allQuestionIds.length - 1);
+    }
+  };
+  const initialIndex = calculateInitialIndex();
+
+  // Initialize currentQuestionIndex state with the calculated initial index
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(initialIndex);
 
   // Derived state for the current question's selected option
   const selectedOptionId = useMemo(() => {

@@ -94,22 +94,35 @@ const columns: ColumnDef<UserAttempt>[] = [
     header: "Summary",
     cell: ({ row }) => {
       const attempt = row.original; // Get the full UserAttempt object
-      // Only show the link if the attempt is finished (score is not null)
-      if (attempt.score === null || attempt.score === undefined) {
-        // Optionally return placeholder text like "In Progress"
-        return <span className="text-xs text-muted-foreground">In Progress</span>;
+
+      // Check if the attempt is finished (score is not null/undefined)
+      const isFinished = !(attempt.score === null || attempt.score === undefined);
+
+      if (isFinished) {
+        // Show "View Summary" for finished attempts
+        return (
+          <Button variant="outline" size="sm" asChild>
+            <Link
+              to="/quiz/$quizId/attempt/$attemptId/summary"
+              params={{ quizId: attempt.quiz_id, attemptId: attempt.attempt_id }}
+            >
+              View Summary
+            </Link>
+          </Button>
+        );
+      } else {
+        // Show "Continue Attempt" for unfinished attempts
+        return (
+          <Button variant="outline" size="sm" asChild>
+            <Link
+              to="/quiz/$quizId/attempt/$attemptId" // Link to the attempt index route
+              params={{ quizId: attempt.quiz_id, attemptId: attempt.attempt_id }}
+            >
+              Continue Attempt
+            </Link>
+          </Button>
+        );
       }
-      return (
-        <Button variant="outline" size="sm" asChild>
-          <Link
-            to="/quiz/$quizId/attempt/$attemptId/summary"
-            params={{ quizId: attempt.quiz_id, attemptId: attempt.attempt_id }}
-            // Add prefetching or other Link options if desired
-          >
-            View Summary
-          </Link>
-        </Button>
-      );
     },
   },
 ];
