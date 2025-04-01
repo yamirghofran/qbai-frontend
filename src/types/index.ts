@@ -21,15 +21,17 @@ export interface QuizListItem {
  updated_at: string; // ISO 8601 date string
 }
 
-// Quiz type
+// Quiz type (updated to include creator info)
 export interface Quiz {
     id: string;
     title: string;
-    description?: string | null; // Added optional description
-    visibility?: string; // Added optional visibility (e.g., 'public', 'private')
+    description?: string | null;
+    visibility?: string;
     questions: Question[];
     created_at: string;
     updated_at: string;
+    creator_name?: string | null;    // Added optional creator name
+    creator_picture?: string | null; // Added optional creator picture URL
   }
   
   // Question type
