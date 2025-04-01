@@ -33,7 +33,7 @@ export function SignupLoginModal() { // Kept original name for consistency with 
                 <p className="text-muted-foreground">From slides to quiz in a minute.</p> {/* Updated tagline */}
               </div>
 
-              <p>Upload your slides, notes, lectures, even youtube videos, and create a quiz with explanations and feedback.</p>
+              <p>Upload your slides, notes, lectures, and create a quiz with explanations and feedback.</p>
 
               {/* Wrapper div with mt-auto to push button to bottom */}
               <div className="mt-auto">
