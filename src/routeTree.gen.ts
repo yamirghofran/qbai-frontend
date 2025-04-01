@@ -18,6 +18,8 @@ import { Route as IndexImport } from './routes/index'
 import { Route as QuizQuizIdImport } from './routes/quiz.$quizId'
 import { Route as QuizQuizIdIndexImport } from './routes/quiz.$quizId.index'
 import { Route as QuizQuizIdAttemptAttemptIdImport } from './routes/quiz.$quizId.attempt.$attemptId'
+import { Route as QuizQuizIdAttemptAttemptIdIndexImport } from './routes/quiz.$quizId.attempt.$attemptId.index'
+import { Route as QuizQuizIdAttemptAttemptIdSummaryImport } from './routes/quiz.$quizId.attempt.$attemptId.summary'
 
 // Create/Update Routes
 
@@ -64,6 +66,20 @@ const QuizQuizIdAttemptAttemptIdRoute = QuizQuizIdAttemptAttemptIdImport.update(
     getParentRoute: () => QuizQuizIdRoute,
   } as any,
 )
+
+const QuizQuizIdAttemptAttemptIdIndexRoute =
+  QuizQuizIdAttemptAttemptIdIndexImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => QuizQuizIdAttemptAttemptIdRoute,
+  } as any)
+
+const QuizQuizIdAttemptAttemptIdSummaryRoute =
+  QuizQuizIdAttemptAttemptIdSummaryImport.update({
+    id: '/summary',
+    path: '/summary',
+    getParentRoute: () => QuizQuizIdAttemptAttemptIdRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -118,19 +134,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizQuizIdAttemptAttemptIdImport
       parentRoute: typeof QuizQuizIdImport
     }
+    '/quiz/$quizId/attempt/$attemptId/summary': {
+      id: '/quiz/$quizId/attempt/$attemptId/summary'
+      path: '/summary'
+      fullPath: '/quiz/$quizId/attempt/$attemptId/summary'
+      preLoaderRoute: typeof QuizQuizIdAttemptAttemptIdSummaryImport
+      parentRoute: typeof QuizQuizIdAttemptAttemptIdImport
+    }
+    '/quiz/$quizId/attempt/$attemptId/': {
+      id: '/quiz/$quizId/attempt/$attemptId/'
+      path: '/'
+      fullPath: '/quiz/$quizId/attempt/$attemptId/'
+      preLoaderRoute: typeof QuizQuizIdAttemptAttemptIdIndexImport
+      parentRoute: typeof QuizQuizIdAttemptAttemptIdImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface QuizQuizIdAttemptAttemptIdRouteChildren {
+  QuizQuizIdAttemptAttemptIdSummaryRoute: typeof QuizQuizIdAttemptAttemptIdSummaryRoute
+  QuizQuizIdAttemptAttemptIdIndexRoute: typeof QuizQuizIdAttemptAttemptIdIndexRoute
+}
+
+const QuizQuizIdAttemptAttemptIdRouteChildren: QuizQuizIdAttemptAttemptIdRouteChildren =
+  {
+    QuizQuizIdAttemptAttemptIdSummaryRoute:
+      QuizQuizIdAttemptAttemptIdSummaryRoute,
+    QuizQuizIdAttemptAttemptIdIndexRoute: QuizQuizIdAttemptAttemptIdIndexRoute,
+  }
+
+const QuizQuizIdAttemptAttemptIdRouteWithChildren =
+  QuizQuizIdAttemptAttemptIdRoute._addFileChildren(
+    QuizQuizIdAttemptAttemptIdRouteChildren,
+  )
+
 interface QuizQuizIdRouteChildren {
   QuizQuizIdIndexRoute: typeof QuizQuizIdIndexRoute
-  QuizQuizIdAttemptAttemptIdRoute: typeof QuizQuizIdAttemptAttemptIdRoute
+  QuizQuizIdAttemptAttemptIdRoute: typeof QuizQuizIdAttemptAttemptIdRouteWithChildren
 }
 
 const QuizQuizIdRouteChildren: QuizQuizIdRouteChildren = {
   QuizQuizIdIndexRoute: QuizQuizIdIndexRoute,
-  QuizQuizIdAttemptAttemptIdRoute: QuizQuizIdAttemptAttemptIdRoute,
+  QuizQuizIdAttemptAttemptIdRoute: QuizQuizIdAttemptAttemptIdRouteWithChildren,
 }
 
 const QuizQuizIdRouteWithChildren = QuizQuizIdRoute._addFileChildren(
@@ -144,7 +191,9 @@ export interface FileRoutesByFullPath {
   '/quizzes': typeof QuizzesRoute
   '/quiz/$quizId': typeof QuizQuizIdRouteWithChildren
   '/quiz/$quizId/': typeof QuizQuizIdIndexRoute
-  '/quiz/$quizId/attempt/$attemptId': typeof QuizQuizIdAttemptAttemptIdRoute
+  '/quiz/$quizId/attempt/$attemptId': typeof QuizQuizIdAttemptAttemptIdRouteWithChildren
+  '/quiz/$quizId/attempt/$attemptId/summary': typeof QuizQuizIdAttemptAttemptIdSummaryRoute
+  '/quiz/$quizId/attempt/$attemptId/': typeof QuizQuizIdAttemptAttemptIdIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -153,7 +202,8 @@ export interface FileRoutesByTo {
   '/attempts': typeof AttemptsRoute
   '/quizzes': typeof QuizzesRoute
   '/quiz/$quizId': typeof QuizQuizIdIndexRoute
-  '/quiz/$quizId/attempt/$attemptId': typeof QuizQuizIdAttemptAttemptIdRoute
+  '/quiz/$quizId/attempt/$attemptId/summary': typeof QuizQuizIdAttemptAttemptIdSummaryRoute
+  '/quiz/$quizId/attempt/$attemptId': typeof QuizQuizIdAttemptAttemptIdIndexRoute
 }
 
 export interface FileRoutesById {
@@ -164,7 +214,9 @@ export interface FileRoutesById {
   '/quizzes': typeof QuizzesRoute
   '/quiz/$quizId': typeof QuizQuizIdRouteWithChildren
   '/quiz/$quizId/': typeof QuizQuizIdIndexRoute
-  '/quiz/$quizId/attempt/$attemptId': typeof QuizQuizIdAttemptAttemptIdRoute
+  '/quiz/$quizId/attempt/$attemptId': typeof QuizQuizIdAttemptAttemptIdRouteWithChildren
+  '/quiz/$quizId/attempt/$attemptId/summary': typeof QuizQuizIdAttemptAttemptIdSummaryRoute
+  '/quiz/$quizId/attempt/$attemptId/': typeof QuizQuizIdAttemptAttemptIdIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -177,6 +229,8 @@ export interface FileRouteTypes {
     | '/quiz/$quizId'
     | '/quiz/$quizId/'
     | '/quiz/$quizId/attempt/$attemptId'
+    | '/quiz/$quizId/attempt/$attemptId/summary'
+    | '/quiz/$quizId/attempt/$attemptId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -184,6 +238,7 @@ export interface FileRouteTypes {
     | '/attempts'
     | '/quizzes'
     | '/quiz/$quizId'
+    | '/quiz/$quizId/attempt/$attemptId/summary'
     | '/quiz/$quizId/attempt/$attemptId'
   id:
     | '__root__'
@@ -194,6 +249,8 @@ export interface FileRouteTypes {
     | '/quiz/$quizId'
     | '/quiz/$quizId/'
     | '/quiz/$quizId/attempt/$attemptId'
+    | '/quiz/$quizId/attempt/$attemptId/summary'
+    | '/quiz/$quizId/attempt/$attemptId/'
   fileRoutesById: FileRoutesById
 }
 
@@ -255,7 +312,19 @@ export const routeTree = rootRoute
     },
     "/quiz/$quizId/attempt/$attemptId": {
       "filePath": "quiz.$quizId.attempt.$attemptId.tsx",
-      "parent": "/quiz/$quizId"
+      "parent": "/quiz/$quizId",
+      "children": [
+        "/quiz/$quizId/attempt/$attemptId/summary",
+        "/quiz/$quizId/attempt/$attemptId/"
+      ]
+    },
+    "/quiz/$quizId/attempt/$attemptId/summary": {
+      "filePath": "quiz.$quizId.attempt.$attemptId.summary.tsx",
+      "parent": "/quiz/$quizId/attempt/$attemptId"
+    },
+    "/quiz/$quizId/attempt/$attemptId/": {
+      "filePath": "quiz.$quizId.attempt.$attemptId.index.tsx",
+      "parent": "/quiz/$quizId/attempt/$attemptId"
     }
   }
 }

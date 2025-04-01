@@ -99,11 +99,11 @@ export default function QuizInterface({ quiz, attempt, attemptId }: QuizInterfac
       try {
         const result = await quizService.finishQuizAttempt(attemptId);
         console.log("Quiz finished successfully!", result);
-        // TODO: Navigate to a results page, passing attemptId or results
-        // navigate({ to: '/attempt/$attemptId/results', params: { attemptId } });
-        alert(`Quiz Finished! Your score: ${result.score}`); // Placeholder alert
-        // Potentially navigate back to quizzes list or a dedicated results page
-        navigate({ to: '/attempts' }); // Navigate to the attempts page
+        // Navigate to the summary page
+        navigate({
+          to: '/quiz/$quizId/attempt/$attemptId/summary',
+          params: { quizId: quiz.id, attemptId }
+        });
       } catch (err) {
         console.error("Failed to finish quiz:", err);
         setError(err instanceof Error ? err.message : "Failed to finish quiz.");

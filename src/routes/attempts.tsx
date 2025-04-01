@@ -12,7 +12,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"; // Keep this import, even if component is missing for now
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button"; // Import Button
 import quizService from '@/api/quizservice';
 import { UserAttempt } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -87,6 +88,30 @@ const columns: ColumnDef<UserAttempt>[] = [
       return <div>{formattedDate}</div>;
     },
   },
+  // Add Actions column for View Summary button
+  {
+    id: "actions",
+    header: "Summary",
+    cell: ({ row }) => {
+      const attempt = row.original; // Get the full UserAttempt object
+      // Only show the link if the attempt is finished (score is not null)
+      if (attempt.score === null || attempt.score === undefined) {
+        // Optionally return placeholder text like "In Progress"
+        return <span className="text-xs text-muted-foreground">In Progress</span>;
+      }
+      return (
+        <Button variant="outline" size="sm" asChild>
+          <Link
+            to="/quiz/$quizId/attempt/$attemptId/summary"
+            params={{ quizId: attempt.quiz_id, attemptId: attempt.attempt_id }}
+            // Add prefetching or other Link options if desired
+          >
+            View Summary
+          </Link>
+        </Button>
+      );
+    },
+  },
 ];
 
 // Loading Skeleton Component (Adjusted order)
@@ -101,6 +126,7 @@ function AttemptsLoadingSkeleton() {
               <TableHead><Skeleton className="h-5 w-48" /></TableHead> {/* Quiz Name */}
               <TableHead><Skeleton className="h-5 w-20" /></TableHead> {/* Score */}
               <TableHead><Skeleton className="h-5 w-32" /></TableHead> {/* Date */}
+              <TableHead><Skeleton className="h-5 w-32" /></TableHead> {/* Summary */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -109,6 +135,7 @@ function AttemptsLoadingSkeleton() {
                 <TableCell><Skeleton className="h-4 w-full" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-full" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-full" /></TableCell> {/* Skeleton for Summary cell */}
               </TableRow>
             ))}
           </TableBody>
@@ -167,6 +194,7 @@ function AttemptsPage() {
               ))
             ) : (
               <TableRow>
+                {/* Update colSpan to include the new actions column */}
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   No attempts found.
                 </TableCell>

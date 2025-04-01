@@ -1,49 +1,32 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router'; // Import Outlet
 import quizService from '@/api/quizservice';
-import QuizInterface from '@/components/quiz-interface';
+// QuizInterface is no longer rendered directly here
 
 // Define the route using dot notation convention
 // The path argument should match the file structure relative to the root
+
+// This component now acts as a layout route and renders the child route (e.g., summary)
+function QuizAttemptLayout() {
+  // The loader data is implicitly passed down to children via Outlet context
+  // We don't need to explicitly use useLoaderData or useParams here unless
+  // this layout component itself needs them for rendering layout elements.
+  return <Outlet />;
+}
+
+// Update the component reference in the route definition
 export const Route = createFileRoute('/quiz/$quizId/attempt/$attemptId')({
-  component: QuizAttemptPage,
+  component: QuizAttemptLayout, // Use the new layout component
   loader: async ({ params }) => {
-    // Loader logic remains the same, params are inferred from the full path
+    // Loader logic remains the same
     try {
       const [quiz, attempt] = await Promise.all([
         quizService.getQuiz(params.quizId),
         quizService.getQuizAttempt(params.attemptId),
       ]);
-      // console.log("Loader (Dot Notation): Fetched quiz data:", quiz); // Removed log
-      // console.log("Loader (Dot Notation): Fetched attempt data:", attempt); // Removed log
       return { quiz, attempt };
     } catch (error) {
-      // console.error("Loader Error (Dot Notation):", error); // Removed log
       throw new Error("Failed to load quiz or attempt data.");
     }
   },
-  // Explicitly add a pending component
   pendingComponent: () => <div>Loading attempt...</div>,
 });
-
-function QuizAttemptPage() {
-  const { quiz, attempt } = Route.useLoaderData();
-  const { attemptId } = Route.useParams();
-
-  // console.log("QuizAttemptPage (Dot Notation): Rendering with quiz:", quiz); // Removed log
-  // console.log("QuizAttemptPage (Dot Notation): Rendering with attempt:", attempt); // Removed log
-  // console.log("QuizAttemptPage (Dot Notation): attemptId from useParams:", attemptId); // Removed log
-
-  if (!quiz || !attempt) {
-    return <div>Error: Quiz or Attempt data is missing.</div>;
-  }
-
-  return (
-    <div className="container mx-auto p-4">
-      <QuizInterface
-        quiz={quiz}
-        attempt={attempt}
-        attemptId={attemptId}
-      />
-    </div>
-  );
-}
