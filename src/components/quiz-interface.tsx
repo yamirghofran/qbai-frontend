@@ -229,10 +229,11 @@ export default function QuizInterface({ quiz, attempt, attemptId }: QuizInterfac
       </Card>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0}>
+        <Button className="select-none" variant="outline" onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0}>
           Previous
         </Button>
         <Button
+        className="select-none"
           onClick={handleNextQuestion}
           // Disable Next/Finish if the current question isn't answered OR if submitting
           disabled={!isAnswered || isSubmitting}
