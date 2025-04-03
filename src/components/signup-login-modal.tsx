@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button" // Corrected import path
 import { Dialog, DialogContent } from "@/components/ui/dialog" // Corrected import path
 
-// TODO: Consider making this configurable via environment variables
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export function SignupLoginModal() { // Kept original name for consistency with __root.tsx import
@@ -34,6 +33,8 @@ export function SignupLoginModal() { // Kept original name for consistency with 
               </div>
 
               <p>Upload your slides, notes, lectures, and create a quiz with explanations and feedback.</p>
+              <p>Completely free!</p>
+
 
               {/* Wrapper div with mt-auto to push button to bottom */}
               <div className="mt-auto">
@@ -46,6 +47,9 @@ export function SignupLoginModal() { // Kept original name for consistency with 
                   </svg>
                   Sign in with Google
                 </Button>
+              </div>
+              <div className="text-center text-sm text-muted-foreground">
+                No credit card required.
               </div>
 
               {/*<div className="text-center text-xs text-muted-foreground pt-4">
