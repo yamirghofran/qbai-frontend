@@ -148,9 +148,9 @@ function QuizAttemptSummaryPage() {
               <Link to="/attempts">Back to My Attempts</Link>
           </Button>
           {/* Optional: Add a button to retake the quiz? Needs logic to create a *new* attempt */}
-          {/* <Button variant="default" className="ml-4" asChild>
-               <Link to="/quiz/$quizId" params={{ quizId: quiz.id }}>Take Quiz Again</Link>
-          </Button> */}
+          <Button variant="default" className="ml-4" asChild>
+               <Link to="/quiz/$quizId" params={{ quizId: quiz.id }}>Retake Quiz</Link>
+          </Button>
       </div>
     </div>
   );
