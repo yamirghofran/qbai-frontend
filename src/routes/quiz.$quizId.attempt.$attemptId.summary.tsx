@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import quizService from '@/api/quizservice';
-import { Quiz, QuizAttempt, AttemptAnswer } from '@/types'; // Import necessary types
+import quizService from '@/api/quizservice'; // Keep one import
+import { Quiz, QuizAttempt, AttemptAnswer } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-// Progress, Accordion removed
 import { Badge } from "@/components/ui/badge";
+import Gauge from "@/components/ui/gauge";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
-import { Separator } from "@/components/ui/separator"; // Import Separator
+// Remove Check, X, CheckCircle, XCircle, Info as they are in the component now
+import { QuizQuestionReview } from '@/components/quiz-question-review'; // Import the new component
 
 // Define the route
 export const Route = createFileRoute('/quiz/$quizId/attempt/$attemptId/summary')({
@@ -35,14 +35,16 @@ export const Route = createFileRoute('/quiz/$quizId/attempt/$attemptId/summary')
   errorComponent: ({ error }) => <div className="container mx-auto p-4 text-red-500">Error loading summary: {error.message}</div>,
 });
 
-// Helper function to find user's answer for a question
-const findUserAnswer = (attemptAnswers: AttemptAnswer[], questionId: string): AttemptAnswer | undefined => {
+// Helper function to find user's answer for a question (needed for getTopicPerformance)
+const findUserAnswer = (attemptAnswers: AttemptAnswer[] | null | undefined, questionId: string): AttemptAnswer | undefined => {
   // Ensure attemptAnswers is an array before trying to find
-  if (!Array.isArray(attemptAnswers)) {
+  if (!attemptAnswers || !Array.isArray(attemptAnswers)) {
     return undefined;
   }
   return attemptAnswers.find(ans => ans.question_id === questionId);
 };
+
+// Remove findUserAnswer helper function - moved to component
 
 // Helper function to get topic performance
 const getTopicPerformance = (quiz: Quiz, attempt: QuizAttempt): Record<string, { correct: number; total: number }> => {
@@ -67,7 +69,7 @@ const getTopicPerformance = (quiz: Quiz, attempt: QuizAttempt): Record<string, {
 
 function QuizAttemptSummaryPage() {
   const { quiz, attempt } = Route.useLoaderData();
-  // const params = Route.useParams(); // Get params if needed for links etc.
+  // Remove state and toggle function - moved to component
 
   if (!quiz || !attempt) {
     return <div className="container mx-auto p-4 text-red-500">Error: Could not load quiz or attempt data for summary.</div>;
@@ -105,108 +107,41 @@ function QuizAttemptSummaryPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold">{quiz.title} - Summary</CardTitle>
-          <CardDescription>Attempt completed on: {attempt.end_time ? new Date(attempt.end_time).toLocaleString() : 'N/A'}</CardDescription>
+          <CardDescription>{attempt.end_time ? new Date(attempt.end_time).toLocaleString() : 'N/A'}</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Updated Score Display */}
-          <div className="space-y-1">
-             <p className="text-2xl font-bold text-center">{scorePercentage}%</p>
-             <p className="text-sm text-muted-foreground text-center">{attempt.score} / {totalQuestions} correct</p>
-          </div>
-        </CardContent>
-      </Card>
+          {/* Combined Score Gauge and Topics */}
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+            {/* Left Side: Gauge */}
+            <div className="flex flex-col items-center flex-shrink-0">
+              {/* Pass scorePercentage as value, showMax optionally displays raw score */}
+              {/* Pass correct props: value (percentage), showCounts, correctCount, totalCount */}
+              <Gauge value={scorePercentage} max={100} size="md" showCounts={true} correctCount={attempt.score} totalCount={totalQuestions} />
+            </div>
 
-      {/* Topics Recap - Show only incorrect */}
-      <Card>
-          <CardHeader>
-              <CardTitle>Topics to Review</CardTitle>
-          </CardHeader>
-          <CardContent>
+            {/* Right Side: Topics to Review */}
+            <div className="flex-grow w-full">
+              <h3 className="text-lg font-semibold mb-3">Topics to Review</h3>
               {incorrectTopics.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                      {incorrectTopics.map((topic) => (
-                          <Badge key={topic} variant="secondary">{topic}</Badge>
-                      ))}
-                  </div>
-              ) : (
-                  <p className="text-muted-foreground">Great job! No specific topics need review based on this attempt.</p>
-              )}
-          </CardContent>
-      </Card>
-
-      {/* Question & Answer Review - Vertical List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Question Review</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {quiz.questions && quiz.questions.length > 0 ? quiz.questions.map((question, index) => {
-              const userAnswer = findUserAnswer(attempt.answers, question.id);
-              const wasCorrect = userAnswer?.is_correct ?? false;
-              const selectedOption = question.options?.find(opt => opt.id === userAnswer?.selected_answer_id);
-              const correctOption = question.options?.find(opt => opt.is_correct);
-
-              return (
-                <div key={question.id} className="p-4 border rounded-md">
-                  <div className="flex items-start gap-3 mb-3">
-                    {/* Indicator */}
-                    <div className="flex-shrink-0 mt-1">
-                       {userAnswer ? (
-                           wasCorrect ? <Check className="h-5 w-5 text-green-500" /> : <X className="h-5 w-5 text-red-500" />
-                       ) : (
-                           <span className="h-5 w-5 inline-block text-muted-foreground">-</span> // Placeholder for unanswered
-                       )}
-                    </div>
-                    {/* Question Text & Topic */}
-                    <div className="flex-grow">
-                       <p className="font-medium">{index + 1}. {question.text}</p>
-                       {question.topic_title && <Badge variant="outline" className="mt-1 text-xs">{question.topic_title}</Badge>}
-                    </div>
-                  </div>
-
-                  {/* Answer Display */}
-                  <div className="pl-8 text-sm space-y-2"> {/* Indent answers */}
-                     {wasCorrect && correctOption && (
-                        <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                           <Check className="h-4 w-4 flex-shrink-0" />
-                           <span>{correctOption.text}</span>
-                           <span className="text-xs text-muted-foreground">(Correct)</span>
-                        </div>
-                     )}
-                     {!wasCorrect && userAnswer && selectedOption && (
-                         <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-                            <X className="h-4 w-4 flex-shrink-0" />
-                            <span>{selectedOption.text}</span>
-                            <span className="text-xs text-muted-foreground">(Your Answer)</span>
-                         </div>
-                     )}
-                     {!wasCorrect && correctOption && (
-                         <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                            <Check className="h-4 w-4 flex-shrink-0" />
-                            <span>{correctOption.text}</span>
-                            <span className="text-xs text-muted-foreground">(Correct Answer)</span>
-                         </div>
-                     )}
-                     {!userAnswer && (
-                         <p className="text-muted-foreground italic">Not answered</p>
-                     )}
-                     {/* Explanation */}
-                     {correctOption?.explanation && (
-                         <div className="mt-2 pt-2 border-t text-xs text-muted-foreground">
-                            <strong>Explanation:</strong> {correctOption.explanation}
-                         </div>
-                     )}
-                  </div>
-                   {index < quiz.questions.length - 1 && <Separator className="mt-4" />} {/* Separator between questions */}
+                <div className="flex flex-wrap gap-2">
+                  {incorrectTopics.map((topic) => (
+                    <Badge key={topic} variant="secondary">{topic}</Badge>
+                  ))}
                 </div>
-              );
-            }) : (
-              <p className="text-muted-foreground p-4 text-center">No questions found for this quiz.</p>
-            )}
+              ) : (
+                <p className="text-sm text-muted-foreground">Great job! No specific topics need review based on this attempt.</p>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Removed the separate Topics Recap card as it's now combined with the score */}
+      {/* Question & Answer Review - Vertical List */}
+      {/* Use the extracted component */}
+      <div>
+        <QuizQuestionReview questions={quiz.questions} attemptAnswers={attempt.answers} />
+      </div>
 
       <div className="mt-6 text-center">
           <Button variant="outline" asChild>
