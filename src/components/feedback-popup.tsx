@@ -4,25 +4,37 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "@/components/ui/textarea"
 import { Star } from "lucide-react"
 import { cn } from "@/lib/utils"
+import apiClient from "@/api/client" // Import the API client
 
 export default function FeedbackWidget() {
   const [rating, setRating] = useState<number | null>(null)
-  const [comment, setComment] = useState("")
+  const [content, setContent] = useState("") // Renamed from comment
   const [isOpen, setIsOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = () => {
-    // Here you would typically send the feedback to your backend
-    console.log({ rating, comment })
-    setSubmitted(true)
+  const handleSubmit = async () => { // Make function async
+    if (!rating) return // Should not happen due to button disable, but good practice
 
-    // Reset form after 2 seconds and close popover
-    setTimeout(() => {
-      setRating(null)
-      setComment("")
-      setSubmitted(false)
-      setIsOpen(false)
-    }, 2000)
+    try {
+      // Send feedback to the backend (baseURL '/api' is already in apiClient)
+      await apiClient.post("/feedback", { content, rating })
+      console.log("Feedback submitted:", { rating, content })
+      setSubmitted(true)
+
+      // Reset form after 2 seconds and close popover
+      setTimeout(() => {
+        setRating(null)
+        setContent("") // Reset content
+        setSubmitted(false)
+        setIsOpen(false)
+      }, 2000)
+    } catch (error) {
+      console.error("Failed to submit feedback:", error)
+      // Optionally: Show an error message to the user
+      // For now, just log the error and don't close the popover immediately
+      // You might want to reset submitted state here too if you show an error
+      // setSubmitted(false);
+    }
   }
 
   return (
@@ -41,8 +53,8 @@ export default function FeedbackWidget() {
             <div className="space-y-3">
               <Textarea
                 placeholder="Tell us what you think..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                value={content} // Use content state
+                onChange={(e) => setContent(e.target.value)} // Use setContent
                 className="min-h-[80px] text-sm w-full"
               />
 
