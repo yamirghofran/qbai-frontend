@@ -8,6 +8,7 @@ import {
 import { NavMain } from "@/components/nav-main"
 // import { NavSecondary } from "@/components/nav-secondary" // Remove if unused
 import { NavUser } from "@/components/nav-user"
+import FeedbackWidget from "@/components/feedback-popup" // Import the FeedbackWidget
 import {
   Sidebar,
   SidebarContent,
@@ -71,6 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* mt-auto is handled by flex layout in SidebarContent potentially, or add spacer if needed */}
       </SidebarContent>
       <SidebarFooter>
+        <FeedbackWidget /> {/* Add the FeedbackWidget here */}
         <NavUser />
       </SidebarFooter>
     </Sidebar>
