@@ -23,9 +23,8 @@ function QuizAttemptIndexPage() {
 
   // Render the actual Quiz Interface using the data
   return (
-    // Container div might be redundant if the parent layout already provides it,
-    // but keeping it for consistency for now. Adjust if needed.
-    <div className="container mx-auto p-4">
+    // Remove container and set responsive padding
+    <div className="w-full p-0 md:p-4 mx-0">
       <QuizInterface
         quiz={quiz}
         attempt={attempt}
