@@ -166,11 +166,11 @@ export default function QuizInterface({ quiz, attempt, attemptId }: QuizInterfac
       <Card className="mb-6">
         <CardHeader>
           {/* Use question text from props */}
-          <CardTitle className="text-xl font-semibold flex items-center gap-2">
-            <span>{currentQuestion.text}</span>
+          <CardTitle className="text-xl font-semibold flex flex-col gap-2 md:flex-row md:items-center md:gap-2">
             {currentQuestion.topic_title && (
-              <Badge variant="secondary">{currentQuestion.topic_title}</Badge>
+              <Badge variant="secondary" className="order-first md:order-none">{currentQuestion.topic_title}</Badge>
             )}
+            <span>{currentQuestion.text}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
