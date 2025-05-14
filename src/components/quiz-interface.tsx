@@ -167,10 +167,10 @@ export default function QuizInterface({ quiz, attempt, attemptId }: QuizInterfac
         <CardHeader>
           {/* Use question text from props */}
           <CardTitle className="text-xl font-semibold flex flex-col gap-2 md:flex-row md:items-center md:gap-2">
-            {currentQuestion.topic_title && (
-              <Badge variant="secondary" className="order-first md:order-none">{currentQuestion.topic_title}</Badge>
-            )}
             <span>{currentQuestion.text}</span>
+            {currentQuestion.topic_title && (
+              <Badge variant="secondary" className="order-first md:order-last">{currentQuestion.topic_title}</Badge>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
