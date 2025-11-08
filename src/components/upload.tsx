@@ -179,21 +179,8 @@ export default function MediaUploader() {
       // The path '/quiz/$quizId' should now be recognized
       navigate({ to: '/quiz/$quizId', params: { quizId: response.quizId } });
     } catch (err) {
-      console.error("Quiz generation failed:", err);
-      // Attempt to parse backend error message if available
-      let errorMessage = "An unknown error occurred during quiz generation.";
-      // Check if err is an AxiosError or similar structure
-      if (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object' && 'data' in err.response && err.response.data) {
-          const errorData = err.response.data;
-          if (typeof errorData === 'object' && errorData !== null && 'error' in errorData && typeof errorData.error === 'string') {
-              errorMessage = errorData.error; // Use backend error message
-          } else if (typeof errorData === 'string') {
-              errorMessage = errorData; // Use if error is just a string
-          }
-      } else if (err instanceof Error) {
-          errorMessage = err.message; // Fallback to standard error message
-      }
-      setError(errorMessage);
+      // Display generic error message to avoid exposing sensitive information
+      setError("Oops, there was an error generating your quiz. Please try again.");
       // TODO: Add error notification
     } finally {
       setIsLoading(false);
