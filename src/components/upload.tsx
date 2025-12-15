@@ -3,7 +3,24 @@ import { useNavigate } from "@tanstack/react-router"; // Changed import for TanS
 import { File, Video, X, Loader2 } from "lucide-react"; // Added Loader2
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-//import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import quizService from "@/api/quizservice"; // Corrected import: default export
 
 // Unified type for both files and videos
@@ -65,6 +82,14 @@ export default function MediaUploader() {
   const [error, setError] = useState<string | null>(null); // Added error state
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate(); // Removed 'from' option for now
+
+  // Dialog state
+  const [showCustomizationDialog, setShowCustomizationDialog] = useState(false);
+
+  // Customization options state
+  const [maxQuestions, setMaxQuestions] = useState<number | undefined>(undefined);
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'extreme' | undefined>(undefined);
+  const [customPrompt, setCustomPrompt] = useState<string>("");
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -142,26 +167,31 @@ export default function MediaUploader() {
     setMediaItems((prev) => prev.filter((item) => item.id !== id));
   };
  
-  const handleGenerateQuiz = async () => {
+  // This opens the customization dialog
+  const handleOpenCustomization = () => {
+    if (mediaItems.length === 0) {
+      setError("Please add at least one file.");
+      return;
+    }
+    setShowCustomizationDialog(true);
+  };
+
+  // This actually submits the quiz generation request
+  const handleSubmitQuizGeneration = async () => {
     setIsLoading(true);
     setError(null);
+    setShowCustomizationDialog(false); // Close dialog
     console.log("Starting quiz generation...");
     console.log("Media items:", mediaItems);
+    console.log("Customization options:", { maxQuestions, difficulty, customPrompt });
  
     // Prepare data for quizService.uploadContent
     const files: File[] = mediaItems
       .filter(item => item.sourceType === 'file' && item.file)
       .map(item => item.file as File); // Type assertion as we filtered for item.file
  
-    // const youtubeUrls: string[] = mediaItems
-    //   .filter(item => item.sourceType === 'video' && item.url)
-    //   .map(item => item.url as string); // Type assertion as we filtered for item.url
-    //const youtubeUrls: string[] = []; // Keep variable defined but empty for now
- 
     console.log("Files to upload:", files.map(f => f.name));
-    // console.log("Video URLs:", youtubeUrls); // Commented out logging
  
-    // if (files.length === 0 && youtubeUrls.length === 0) { // Original check
     if (files.length === 0) { // Check only for files now
         setError("Please add at least one file."); // Updated error message
         setIsLoading(false);
@@ -169,19 +199,21 @@ export default function MediaUploader() {
     }
  
     try {
-      // Call the correct API function with the expected data structure
-      // const response = await quizService.uploadContent({ files, youtubeUrls }); // Original call
-      const response = await quizService.uploadContent({ files, youtubeUrls: [] }); // Pass empty array for youtubeUrls
+      // Call the API with optional customization parameters
+      const response = await quizService.uploadContent({ 
+        files, 
+        youtubeUrls: [],
+        maxQuestions,
+        difficulty,
+        customPrompt: customPrompt.trim() || undefined,
+      });
       console.log("Quiz generation successful:", response);
-      // TODO: Add success notification (e.g., using a toast library)
  
       // Navigate using TanStack Router
-      // The path '/quiz/$quizId' should now be recognized
       navigate({ to: '/quiz/$quizId', params: { quizId: response.quizId } });
-    } catch (err) {
+    } catch {
       // Display generic error message to avoid exposing sensitive information
       setError("Oops, there was an error generating your quiz. Please try again.");
-      // TODO: Add error notification
     } finally {
       setIsLoading(false);
     }
@@ -254,7 +286,7 @@ export default function MediaUploader() {
         <Button
           size="lg"
           disabled={mediaItems.length === 0 || isLoading}
-          onClick={handleGenerateQuiz}
+          onClick={handleOpenCustomization}
         >
           {isLoading ? (
             <>
@@ -266,6 +298,103 @@ export default function MediaUploader() {
           )}
         </Button>
       </div>
+
+      {/* Quiz Customization Dialog */}
+      <Dialog open={showCustomizationDialog} onOpenChange={setShowCustomizationDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Customize Your Quiz</DialogTitle>
+            <DialogDescription>
+              Optionally configure your quiz generation settings. Leave fields empty to use defaults.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Max Questions */}
+            <div className="space-y-2">
+              <Label htmlFor="max-questions">Maximum Questions</Label>
+              <Input
+                id="max-questions"
+                type="number"
+                min="1"
+                max="100"
+                placeholder="e.g., 10 (leave empty for default)"
+                value={maxQuestions ?? ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setMaxQuestions(value ? parseInt(value, 10) : undefined);
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Limit the number of questions generated
+              </p>
+            </div>
+
+            {/* Difficulty Level */}
+            <div className="space-y-2">
+              <Label htmlFor="difficulty">Difficulty Level</Label>
+              <Select
+                value={difficulty ?? ''}
+                onValueChange={(value) => {
+                  setDifficulty(value ? value as 'easy' | 'medium' | 'hard' | 'extreme' : undefined);
+                }}
+              >
+                <SelectTrigger id="difficulty">
+                  <SelectValue placeholder="Select difficulty (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">Easy</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="hard">Hard</SelectItem>
+                  <SelectItem value="extreme">Extreme</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Choose the difficulty level for questions
+              </p>
+            </div>
+
+            {/* Custom Instructions */}
+            <div className="space-y-2">
+              <Label htmlFor="custom-prompt">Custom Instructions</Label>
+              <Textarea
+                id="custom-prompt"
+                placeholder="e.g., Focus on practical applications, include code examples..."
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                className="min-h-[100px] resize-none"
+              />
+              <p className="text-xs text-muted-foreground">
+                Provide specific instructions for quiz generation
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowCustomizationDialog(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmitQuizGeneration}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                "Generate Quiz"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {error && (
         <p className="mt-4 text-center text-red-600">{error}</p>
       )}

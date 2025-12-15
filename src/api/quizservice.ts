@@ -35,14 +35,33 @@ interface FinishAttemptResponse {
 // Quiz API service
 const quizService = {
   // Upload files and YouTube URLs to generate a quiz
-  uploadContent: async (data: { files: File[]; youtubeUrls: string[] }): Promise<UploadResponse> => {
+  uploadContent: async (data: { 
+    files: File[]; 
+    youtubeUrls: string[];
+    maxQuestions?: number;
+    difficulty?: 'easy' | 'medium' | 'hard' | 'extreme';
+    customPrompt?: string;
+  }): Promise<UploadResponse> => {
     const formData = new FormData();
+    
+    // Required fields
     data.files.forEach((file) => {
       formData.append('files', file); // Corrected key to match backend expectation
     });
     data.youtubeUrls.forEach((url) => {
       formData.append('videoUrls', url); // Corrected key to match backend expectation
     });
+
+    // Optional customization fields
+    if (data.maxQuestions) {
+      formData.append('max_questions', data.maxQuestions.toString());
+    }
+    if (data.difficulty) {
+      formData.append('difficulty', data.difficulty);
+    }
+    if (data.customPrompt && data.customPrompt.trim()) {
+      formData.append('custom_prompt', data.customPrompt.trim());
+    }
 
     // Corrected endpoint to match backend route
     const response = await apiClient.post<UploadResponse>('/quizzes/generate', formData, {
