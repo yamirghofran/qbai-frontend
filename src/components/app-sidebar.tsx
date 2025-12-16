@@ -3,6 +3,7 @@ import {
   BookOpen,
   ListChecks,
   PlusCircle, // Added icon for Create Quiz
+  Rss, // Added icon for Quiz Feed
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -27,6 +28,13 @@ const navData = {
       url: "/",
       icon: PlusCircle,
       isActive: false, // Router will handle active state based on URL
+      items: [],
+    },
+    {
+      title: "Quiz Feed",
+      url: "/feed",
+      icon: Rss,
+      isActive: false,
       items: [],
     },
     {

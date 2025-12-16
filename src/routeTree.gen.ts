@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as QuizzesImport } from './routes/quizzes'
+import { Route as FeedImport } from './routes/feed'
 import { Route as AttemptsImport } from './routes/attempts'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
@@ -26,6 +27,12 @@ import { Route as QuizQuizIdAttemptAttemptIdSummaryImport } from './routes/quiz.
 const QuizzesRoute = QuizzesImport.update({
   id: '/quizzes',
   path: '/quizzes',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FeedRoute = FeedImport.update({
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -104,6 +111,13 @@ declare module '@tanstack/react-router' {
       path: '/attempts'
       fullPath: '/attempts'
       preLoaderRoute: typeof AttemptsImport
+      parentRoute: typeof rootRoute
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedImport
       parentRoute: typeof rootRoute
     }
     '/quizzes': {
@@ -188,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/attempts': typeof AttemptsRoute
+  '/feed': typeof FeedRoute
   '/quizzes': typeof QuizzesRoute
   '/quiz/$quizId': typeof QuizQuizIdRouteWithChildren
   '/quiz/$quizId/': typeof QuizQuizIdIndexRoute
@@ -200,6 +215,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/attempts': typeof AttemptsRoute
+  '/feed': typeof FeedRoute
   '/quizzes': typeof QuizzesRoute
   '/quiz/$quizId': typeof QuizQuizIdIndexRoute
   '/quiz/$quizId/attempt/$attemptId/summary': typeof QuizQuizIdAttemptAttemptIdSummaryRoute
@@ -211,6 +227,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/attempts': typeof AttemptsRoute
+  '/feed': typeof FeedRoute
   '/quizzes': typeof QuizzesRoute
   '/quiz/$quizId': typeof QuizQuizIdRouteWithChildren
   '/quiz/$quizId/': typeof QuizQuizIdIndexRoute
@@ -225,6 +242,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/attempts'
+    | '/feed'
     | '/quizzes'
     | '/quiz/$quizId'
     | '/quiz/$quizId/'
@@ -236,6 +254,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/attempts'
+    | '/feed'
     | '/quizzes'
     | '/quiz/$quizId'
     | '/quiz/$quizId/attempt/$attemptId/summary'
@@ -245,6 +264,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/attempts'
+    | '/feed'
     | '/quizzes'
     | '/quiz/$quizId'
     | '/quiz/$quizId/'
@@ -258,6 +278,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AttemptsRoute: typeof AttemptsRoute
+  FeedRoute: typeof FeedRoute
   QuizzesRoute: typeof QuizzesRoute
   QuizQuizIdRoute: typeof QuizQuizIdRouteWithChildren
 }
@@ -266,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AttemptsRoute: AttemptsRoute,
+  FeedRoute: FeedRoute,
   QuizzesRoute: QuizzesRoute,
   QuizQuizIdRoute: QuizQuizIdRouteWithChildren,
 }
@@ -283,6 +305,7 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/attempts",
+        "/feed",
         "/quizzes",
         "/quiz/$quizId"
       ]
@@ -295,6 +318,9 @@ export const routeTree = rootRoute
     },
     "/attempts": {
       "filePath": "attempts.tsx"
+    },
+    "/feed": {
+      "filePath": "feed.tsx"
     },
     "/quizzes": {
       "filePath": "quizzes.tsx"

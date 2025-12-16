@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { Quiz, QuizListItem, QuizAttempt, UserAttempt } from '../types'; // Import QuizListItem, QuizAttempt, AttemptAnswer, UserAttempt
+import { Quiz, QuizListItem, QuizAttempt, UserAttempt, PublicQuizFeedItem } from '../types'; // Import QuizListItem, QuizAttempt, AttemptAnswer, UserAttempt, PublicQuizFeedItem
 
 // Type for upload response from backend
 interface UploadResponse {
@@ -82,6 +82,18 @@ const quizService = {
     } catch (error) {
       console.error('Error fetching user quizzes:', error);
       // Re-throw or handle error as appropriate for your application
+      throw error;
+    }
+  },
+
+  // Get all public quizzes for the feed
+  listPublicQuizzes: async (): Promise<PublicQuizFeedItem[]> => {
+    try {
+      const response = await apiClient.get<PublicQuizFeedItem[]>('/quizzes/feed');
+      console.log("Fetched public quizzes:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching public quizzes:', error);
       throw error;
     }
   },

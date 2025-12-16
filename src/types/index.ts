@@ -21,6 +21,18 @@ export interface QuizListItem {
  updated_at: string; // ISO 8601 date string
 }
 
+// Type for public quiz feed items with creator info
+export interface PublicQuizFeedItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  visibility: string;
+  created_at: string;
+  updated_at: string;
+  creator_name?: string | null;
+  creator_picture?: string | null;
+}
+
 // Quiz type (updated to include creator info)
 export interface Quiz {
     id: string;
