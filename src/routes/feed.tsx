@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { useState, useMemo } from 'react';
 import quizService from '@/api/quizservice';
 import { PublicQuizFeedItem } from '@/types';
 import {
@@ -10,6 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 // Define the route
 export const Route = createFileRoute('/feed')({
@@ -57,15 +60,53 @@ function FeedLoadingSkeleton() {
 // Main Feed Page Component
 function FeedPage() {
   const { quizzes } = Route.useLoaderData();
+  const [searchTerm, setSearchTerm] = useState('');
 
   console.log("FeedPage: Rendering with quizzes data:", quizzes);
+
+  // Filter quizzes based on search term
+  const filteredQuizzes = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return quizzes;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    return quizzes.filter((quiz) => {
+      return (
+        quiz.title.toLowerCase().includes(searchLower) ||
+        quiz.description?.toLowerCase().includes(searchLower) ||
+        quiz.creator_name?.toLowerCase().includes(searchLower)
+      );
+    });
+  }, [quizzes, searchTerm]);
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Quiz Feed</h1>
-      <p className="text-muted-foreground mb-6">
+      <p className="text-muted-foreground mb-4">
         Discover quizzes created by the community
       </p>
+
+      {/* Search Input */}
+      <div className="mb-6 max-w-md">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search quizzes by title, description, or creator..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        {searchTerm && (
+          <p className="text-sm text-muted-foreground mt-2">
+            {filteredQuizzes.length} {filteredQuizzes.length === 1 ? 'quiz' : 'quizzes'} found
+          </p>
+        )}
+      </div>
+
+      {/* Quiz Grid */}
       {quizzes.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No public quizzes available yet.</p>
@@ -73,9 +114,16 @@ function FeedPage() {
             Be the first to create a public quiz!
           </p>
         </div>
+      ) : filteredQuizzes.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No quizzes match your search.</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Try a different search term.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quizzes.map((quiz) => (
+          {filteredQuizzes.map((quiz) => (
             <Link
               key={quiz.id}
               to="/quiz/$quizId"
