@@ -35,15 +35,15 @@ interface FinishAttemptResponse {
 // Quiz API service
 const quizService = {
   // Upload files and YouTube URLs to generate a quiz
-  uploadContent: async (data: { 
-    files: File[]; 
+  uploadContent: async (data: {
+    files: File[];
     youtubeUrls: string[];
     maxQuestions?: number;
     difficulty?: 'easy' | 'medium' | 'hard' | 'extreme';
     customPrompt?: string;
   }): Promise<UploadResponse> => {
     const formData = new FormData();
-    
+
     // Required fields
     data.files.forEach((file) => {
       formData.append('files', file); // Corrected key to match backend expectation
@@ -99,8 +99,11 @@ const quizService = {
   },
 
   // Get a specific quiz by ID (including questions and options)
-  getQuiz: async (id: string): Promise<Quiz> => {
-    const response = await apiClient.get<Quiz>(`/quizzes/${id}`);
+  // If attemptId is provided, backend returns option order shuffled deterministically for that attempt.
+  getQuiz: async (id: string, attemptId?: string): Promise<Quiz> => {
+    const response = await apiClient.get<Quiz>(`/quizzes/${id}`, {
+      params: attemptId ? { attemptId } : undefined,
+    });
     return response.data;
   },
 

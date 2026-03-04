@@ -14,7 +14,7 @@ export const Route = createFileRoute('/quiz/$quizId/attempt/$attemptId/summary')
   loader: async ({ params }) => {
     try {
       const [quiz, attempt] = await Promise.all([
-        quizService.getQuiz(params.quizId),
+        quizService.getQuiz(params.quizId, params.attemptId),
         quizService.getQuizAttempt(params.attemptId),
       ]);
       // Pre-process or validate data if needed
